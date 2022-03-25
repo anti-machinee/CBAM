@@ -1,0 +1,66 @@
+version_name: Debug
+
+train_loader:
+  type: data_loader.FaceDataloader
+  args:
+    batch_size: 32
+    shuffle: false  # false if sampler is true because default sampler has shuffle=True
+    sampler: true
+    num_workers: 10
+    drop_last: false
+
+    mode: train
+    root_path: /home/duongdq/2t_ssd1/big_dataset/AIDeveloper
+    label_folders: [
+      ms1m_v2_small/images,
+    ]
+    image_size: [224, 224]
+
+val_loader:
+  type: data_loader.FaceDataloader
+  args:
+    batch_size: 32
+    shuffle: false
+    sampler: false
+    num_workers: 10
+    drop_last: false
+
+    mode: val
+    root_path: /home/duongdq/2t_ssd1/big_dataset/AIDeveloper
+    label_folders: [
+      ms1m_v2_small/images,
+    ]
+    image_size: [224, 224]
+
+model:
+  type: model.get_model
+  args:
+    name: resnet50
+loss:
+  type: loss.CrossEntropyLoss
+  args:
+optimizer:
+  type: optimizer.Adam
+  args:
+    lr: 0.0001
+    weight_decay: 0.0005
+    amsgrad: false
+lr_scheduler:
+  type: lr_scheduler.StepLR
+  args:
+    step_size: 5
+    gamma: 0.5
+metric:
+  type: metric.calculate_accuracy
+  args:
+
+trainer:
+  type: trainer.Trainer
+  args:
+    save_dir: saved
+    verbosity: 2
+    save_period: 1
+    epochs: 1000
+    monitor: min val_loss
+    early_stop: 10
+    tensorboard: true
